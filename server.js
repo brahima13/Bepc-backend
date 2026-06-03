@@ -7,7 +7,7 @@ const app = express();
 
 app.use(cors({
   origin: [
-    "https://fastidious-rolypoly-50d4bf.netlify.app",
+    "https://bepcstatnotes.netlify.app",,
     "http://localhost:5173"
   ],
   credentials: true
