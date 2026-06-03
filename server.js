@@ -1,46 +1,36 @@
-const express = require('express');
-const mongoose = require('mongoose');
-require('dotenv').config();
+const express = require("express");
+const cors = require("cors");
+const mongoose = require("mongoose");
+require("dotenv").config();
 
 const app = express();
 
-// Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(cors({
+  origin: [
+    "https://fastidious-rolypoly-50d4bf.netlify.app",
+    "http://localhost:5173"
+  ],
+  credentials: true
+}));
 
-// Import routes
-const authRoutes = require('./routes/auth');
-const paymentRoutes = require('./routes/payment');
-const subscriptionRoutes = require('./routes/subscription');
+app.use(express.json({ limit: "10mb" }));
 
-// Import middleware
-const authMiddleware = require('./middleware/auth');
-
-// Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/bepc', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => console.log('MongoDB connected'))
-.catch(err => console.error('MongoDB connection failed:', err));
+// Connexion MongoDB
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log("✅ MongoDB connecté"))
+  .catch(err => console.error("❌ MongoDB erreur:", err));
 
 // Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/payment', paymentRoutes);
-app.use('/api/subscription', subscriptionRoutes);
+app.use("/api/auth",         require("./routes/auth"));
+app.use("/api/payment",      require("./routes/payment"));
+app.use("/api/subscription", require("./routes/subscription"));
 
-// Health check
-app.get('/health', (req, res) => {
-  res.json({ status: 'Server is running' });
+// Test
+app.get("/", (req, res) => {
+  res.json({ message: "✅ Backend BEPC en ligne !" });
 });
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: 'Internal server error' });
-});
-
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`✅ Serveur démarré sur le port ${PORT}`);
 });
